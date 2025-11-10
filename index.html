@@ -12,10 +12,10 @@
         $('h2').html("Click This!");
         $('p').html("Hello, jQuery is Awesome! it is sooo simple!").click("Thanks!");
         
-})
- define(["jquery-oauth", function(jqOAuth) {
+});
+ function jqOAuth() {
    const csrfToken = $("input[name='_token']).val();
-    var auth = new jqOAuth({
+      var auth = new jqOAuth({
         csrfToken: csrfToken,
         events: {
             login: function() {
@@ -59,7 +59,6 @@ $.ajax({
        }
    }
 });
-
 </script>
      <button onclick="helloworld()"><h1></h1></button>
      <link rel="stylesheet" src="style.css">
