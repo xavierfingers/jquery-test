@@ -2,6 +2,7 @@
   <html>
 	<body>
        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+      <script src="https://raw.githubusercontent.com/esbenp/jquery-oauth/refs/heads/master/dist/jquery.oauth.min.js"></script>
        <script>
         function helloworld() {
           alert("Hello, World!");
@@ -10,11 +11,63 @@
         $('h1').html("<em>Hello, World!</em>");
         $('h2').html("Click This!");
         $('p').html("Hello, jQuery is Awesome! it is sooo simple!").click("Thanks!");
+        
 })
-	</script>
+ define(["jquery-oauth", function(jqOAuth) {
+   const csrfToken = $("input[name='_token']).val();
+    var auth = new jqOAuth({
+        csrfToken: csrfToken,
+        events: {
+            login: function() {
+                // User is hereby logged in and the 
+                // access token will be added to subsequent
+                // $.ajax calls, until a new token cannot 
+                // be acquired or auth.logout() is called.
+            },
+            logout: function() {
+                // auth.logout() has been called and the 
+                // authorization headers are removed from 
+                // $.ajaxSettings. Tokens are removed from
+                // localStorage.
+            },
+            tokenExpiration: function() {
+                // this event is fired when 401 calls are 
+                // received from the server. Has to return 
+                // an ajax promise. 
+                // New tokens are set with auth.setAccessToken()
+
+                return $.post("/refresh-token-proxy-endpoint").success(function(response){
+                     auth.setAccessToken(response.accessToken, response.accessTokenExpiration);
+                });
+            }
+        }
+    });
+});
+$.ajax({
+   url: "/access-token-proxy-endpoint",
+   method: "POST",
+   data: {
+       username: "zain",
+       password: "auth"
+   },
+   statusCode: {
+       200: function(response) {
+           auth.login(response.accessToken, response.accessTokenExpiration);
+       },
+       401: function() {
+           alert("The username or password were not correct. Try again.");
+       }
+   }
+});
+
+</script>
      <button onclick="helloworld()"><h1></h1></button>
      <link rel="stylesheet" src="style.css">
      <p></p>
+     <script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
     </body>
 </html>
 
